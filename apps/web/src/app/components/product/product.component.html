@@ -1,0 +1,20 @@
+<div class="container mx-auto" *ngIf="product$ | async as product">
+  <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+    <div class="bg-gradient-to-r from-slate-900 to-slate-500 p-4">
+      <h2 class="text-lg font-bold text-white">{{ product.name }}</h2>
+      <div class="flex justify-between -mx-4">
+        <span class="mx-4 text-xs text-white opacity-75">{{ product.id }}</span>
+        <span class="mx-4 text-xs text-white opacity-75">{{ product.updatedAt | date: "dd/MM/yyyy HH:mm" }}</span>
+      </div>
+    </div>
+    <div class="p-6 flex -mx-4">
+      <div class="mx-4 mb-4">
+        <ng-container *ngFor="let property of product.properties | keyvalue">
+          <label class="block text-slate-600 text-sm font-bold mb-1 capitalize">{{ property.key }}</label>
+          <p class="text-slate-900">{{ property.value }}</p>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <!-- @todo add product task table here -->
+</div>
