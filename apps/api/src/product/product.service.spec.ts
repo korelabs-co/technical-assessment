@@ -10,7 +10,6 @@ import { ProductProperties } from './entities/product-properties.entity';
 describe('ProductService', () => {
   let service: ProductService;
   let repository: Repository<Product>;
-  let propertiesRepository = Repository<ProductProperties>;
 
   beforeEach(async () => {
     const repositoryToken = getRepositoryToken(Product);
@@ -119,7 +118,7 @@ describe('ProductService', () => {
       // Verify final findOne
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id: createProductId },
-        relations: ['productProperties'],
+        relations: ['tasks', 'productProperties'],
       });
     });
   });
@@ -137,7 +136,10 @@ describe('ProductService', () => {
     it('should call repository.findOneBy with the id', () => {
       const id = '123';
       service.findOne(id);
-      expect(repository.findOneBy).toHaveBeenCalledWith({ id });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id },
+        relations: ['tasks', 'productProperties'],
+      });
     });
   });
 
@@ -206,7 +208,7 @@ describe('ProductService', () => {
       // Verify final findOne
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { id },
-        relations: ['productProperties'],
+        relations: ['tasks', 'productProperties'],
       });
     });
   });

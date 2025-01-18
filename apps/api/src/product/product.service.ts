@@ -39,7 +39,7 @@ export class ProductService {
 
     return this._repository.findOne({
       where: { id: productId },
-      relations: ['productProperties'],
+      relations: ['tasks', 'productProperties'],
     });
   }
 
@@ -51,7 +51,10 @@ export class ProductService {
   }
 
   findOne(id: string) {
-    return this._repository.findOneBy({ id });
+    return this._repository.findOne({
+      where: { id },
+      relations: ['tasks', 'productProperties'],
+    });
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
@@ -72,7 +75,7 @@ export class ProductService {
 
     return this._repository.findOne({
       where: { id: id },
-      relations: ['productProperties'],
+      relations: ['tasks', 'productProperties'],
     });
   }
 

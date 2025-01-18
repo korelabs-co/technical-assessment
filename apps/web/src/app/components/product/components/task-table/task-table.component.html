@@ -1,0 +1,116 @@
+<div class="mt-8">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-xl font-bold text-slate-900">Tasks</h3>
+    <button
+      (click)="isAddingTask = true"
+      class="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800"
+      *ngIf="!isAddingTask"
+    >
+      Add Task
+    </button>
+  </div>
+
+  <!-- Add Task Form -->
+  <div *ngIf="isAddingTask" class="mb-6 p-4 bg-slate-50 rounded-md">
+    <h4 class="text-lg font-semibold mb-4">New Task</h4>
+    <form #taskForm="ngForm" (ngSubmit)="submitTask()">
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700">Title</label>
+          <input
+            type="text"
+            [(ngModel)]="newTask.title"
+            name="title"
+            required
+            class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700"
+            >Description</label
+          >
+          <textarea
+            [(ngModel)]="newTask.description"
+            name="description"
+            required
+            class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"
+          ></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700"
+            >Due Date</label
+          >
+          <input
+            type="datetime-local"
+            [(ngModel)]="newTask.dueAt"
+            name="dueAt"
+            required
+            class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"
+          />
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end space-x-3">
+        <button
+          type="button"
+          (click)="cancelAdd()"
+          class="px-4 py-2 bg-white border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="!taskForm.form.valid"
+          class="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 disabled:bg-slate-400"
+        >
+          Save Task
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tasks Table -->
+  <div class="bg-white shadow-md rounded-md overflow-hidden">
+    <table class="min-w-full">
+      <thead>
+        <tr class="bg-slate-100">
+          <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">
+            Title
+          </th>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">
+            Description
+          </th>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">
+            Due Date
+          </th>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-slate-700">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200">
+        <tr *ngFor="let task of tasks; let i = index">
+          <td class="px-6 py-4 text-sm text-slate-900">{{ task.title }}</td>
+          <td class="px-6 py-4 text-sm text-slate-600">
+            {{ task.description }}
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-600">
+            {{ task.dueAt | date: "medium" }}
+          </td>
+          <td class="px-6 py-4 text-sm">
+            <button
+              (click)="deleteTask(i)"
+              class="text-red-600 hover:text-red-900"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="tasks.length === 0">
+          <td colspan="4" class="px-6 py-4 text-sm text-center text-slate-500">
+            No tasks available
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
