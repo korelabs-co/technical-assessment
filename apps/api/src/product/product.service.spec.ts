@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProductService } from './product.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { ProductService } from './product.service';
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -49,7 +49,7 @@ describe('ProductService', () => {
   describe('findAll', () => {
     it('should call repository.find', () => {
       service.findAll();
-      expect(repository.find).toHaveBeenCalled();
+      expect(repository.find).toHaveBeenCalledWith({ relations: ['tasks'] });
     });
   });
 
@@ -65,7 +65,7 @@ describe('ProductService', () => {
     it('should call repository.save with the updated product', () => {
       const id = '123';
       const updateProductDto: UpdateProductDto = {
-        name: 'test product - updated'
+        name: 'test product - updated',
       };
       service.update(id, updateProductDto);
       expect(repository.save).toHaveBeenCalledWith({ ...updateProductDto, id });

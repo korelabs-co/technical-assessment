@@ -12,7 +12,6 @@ type ProductWithTasks = Product & { tasks?: Task[] };
 export class ProductService {
   constructor(
     @InjectRepository(Product) private _repository: Repository<Product>,
-    @InjectRepository(Task) private _taskRepository: Repository<Task>,
   ) {}
 
   create(createProductDto: CreateProductDto) {
@@ -20,14 +19,9 @@ export class ProductService {
   }
 
   async findAll() {
-    const products: ProductWithTasks[] = await this._repository.find();
-
-    for (const product of products) {
-      product.tasks = await this._taskRepository.find({
-        where: { product: { id: product.id } },
-      });
-    }
-
+    const products: ProductWithTasks[] = await this._repository.find({
+      relations: ['tasks'],
+    });
     return products;
   }
 
