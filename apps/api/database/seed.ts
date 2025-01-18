@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Product } from '../src/product/entities/product.entity';
 import { Task } from '../src/task/entities/task.entity';
+import { ProductProperties } from 'src/product/entities/product-properties.entity';
 
 require('dotenv').config({ path: './.env' });
 
@@ -22,16 +23,21 @@ const seed = async () => {
   await db.query(`TRUNCATE "products" CASCADE;`);
 
   try {
-    const products: Product[] = [];
+    const savedProducts: Product[] = [];
     for (let i = 0; i < 100; i++) {
       const product = new Product();
       product.name = `Product ${i}`;
-      product.properties = { description: `This is Product ${i}` };
 
-      products.push(product);
+      const productProperties = new ProductProperties();
+      productProperties.properties = { description: `This is Product ${i}` };
+
+      await db.manager.save(productProperties);
+      product.productProperties = productProperties;
+
+      const savedProduct = await db.manager.save(product);
+
+      savedProducts.push(savedProduct);
     }
-
-    const savedProducts = await db.manager.save(products);
 
     const productTasks = savedProducts.flatMap((product) => {
       const tasks: Task[] = [];
@@ -46,7 +52,7 @@ const seed = async () => {
       }
 
       return tasks;
-    })
+    });
 
     await db.manager.save(productTasks);
 

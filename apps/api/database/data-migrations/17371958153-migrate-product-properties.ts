@@ -31,7 +31,8 @@ const migrateProperties = async () => {
     for (const product of products) {
       const properties = new ProductProperties();
       properties.productId = product.id;
-      properties.properties = product.properties;
+      // NOTE: This is dirty, but this script should only be exexuted for migration '1737198235551-migration'
+      properties.properties = (product as any).properties;
 
       await db.getRepository(ProductProperties).save(properties);
       console.log(`Migrated properties for product ${product.id}`);
