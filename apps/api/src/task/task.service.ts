@@ -14,8 +14,17 @@ export class TaskService {
   ) {}
 
   async create(createTaskDto: CreateTaskDto) {
-    // @fixme createTaskDto.productId is not being saved to the task
-    return this._repository.save(createTaskDto);
+    if (!createTaskDto.productId) {
+      return this._repository.save({ ...createTaskDto });
+    }
+
+    const product = await this._productRepository.findOneBy({
+      id: createTaskDto.productId,
+    });
+    if (product === null) {
+      return null;
+    }
+    return this._repository.save({ ...createTaskDto, product });
   }
 
   findAll() {
@@ -27,7 +36,17 @@ export class TaskService {
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
-    return this._repository.save({ ...updateTaskDto, id });
+    if (!updateTaskDto.productId) {
+      return this._repository.save({ ...updateTaskDto, id });
+    }
+
+    const product = await this._productRepository.findOneBy({
+      id: updateTaskDto.productId,
+    });
+    if (product === null) {
+      return null;
+    }
+    return this._repository.save({ ...updateTaskDto, id, product });
   }
 
   remove(id: string) {
