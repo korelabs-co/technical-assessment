@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import {
   Task,
-  TaskInput,
+  CreateTaskInput,
   TasksService,
 } from "../../../../services/task.service";
 
@@ -20,7 +20,8 @@ export class TaskTableComponent {
   @Output() tasksChange = new EventEmitter<Task[]>();
 
   isAddingTask = false;
-  newTask: TaskInput = {
+  editingTask: Task | null = null;
+  currentTask: CreateTaskInput = {
     title: "",
     description: "",
     dueAt: "",
@@ -31,33 +32,55 @@ export class TaskTableComponent {
   submitTask() {
     if (!this.productId) return;
 
-    const taskToCreate = {
-      ...this.newTask,
-      productId: this.productId,
+    if (this.editingTask) {
+      // Handle update
+      this.tasksService
+        .updateTask(this.editingTask.id, {
+          ...this.currentTask,
+        })
+        .subscribe(() => {
+          this.tasksChange.emit(this.tasks);
+          this.resetForm();
+        });
+    } else {
+      // Handle create
+      this.tasksService
+        .createTask({
+          ...this.currentTask,
+        })
+        .subscribe(() => {
+          this.tasksChange.emit(this.tasks);
+          this.resetForm();
+        });
+    }
+  }
+
+  startEdit(task: Task) {
+    this.editingTask = task;
+    this.currentTask = {
+      title: task.title,
+      description: task.description,
+      dueAt: task.dueAt,
     };
-
-    this.tasksService.createTask(taskToCreate).subscribe((createdTask) => {
-      this.tasksChange.emit(this.tasks);
-      this.resetForm();
-    });
   }
 
-  deleteTask(index: number) {
-    this.tasksService.deleteTask(this.tasks[index].id).subscribe(() => {
+  deleteTask(taskId: string) {
+    this.tasksService.deleteTask(taskId).subscribe(() => {
       this.tasksChange.emit(this.tasks);
     });
   }
 
-  cancelAdd() {
+  cancelEdit() {
     this.resetForm();
   }
 
   private resetForm() {
-    this.newTask = {
+    this.currentTask = {
       title: "",
       description: "",
       dueAt: "",
     };
     this.isAddingTask = false;
+    this.editingTask = null;
   }
 }

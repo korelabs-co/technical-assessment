@@ -1,25 +1,31 @@
 <div class="mt-8">
   <div class="flex justify-between items-center mb-4">
     <h3 class="text-xl font-bold text-slate-900">Tasks</h3>
+    <!-- Changed condition to also check !editingTask -->
     <button
       (click)="isAddingTask = true"
       class="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800"
-      *ngIf="!isAddingTask"
+      *ngIf="!isAddingTask && !editingTask"
     >
       Add Task
     </button>
   </div>
 
-  <!-- Add Task Form -->
-  <div *ngIf="isAddingTask" class="mb-6 p-4 bg-slate-50 rounded-md">
-    <h4 class="text-lg font-semibold mb-4">New Task</h4>
+  <!-- Add/Edit Task Form -->
+  <div
+    *ngIf="isAddingTask || editingTask"
+    class="mb-6 p-4 bg-slate-50 rounded-md"
+  >
+    <h4 class="text-lg font-semibold mb-4">
+      {{ editingTask ? "Edit Task" : "New Task" }}
+    </h4>
     <form #taskForm="ngForm" (ngSubmit)="submitTask()">
       <div class="grid grid-cols-1 gap-4">
         <div>
           <label class="block text-sm font-medium text-slate-700">Title</label>
           <input
             type="text"
-            [(ngModel)]="newTask.title"
+            [(ngModel)]="currentTask.title"
             name="title"
             required
             class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"
@@ -30,7 +36,7 @@
             >Description</label
           >
           <textarea
-            [(ngModel)]="newTask.description"
+            [(ngModel)]="currentTask.description"
             name="description"
             required
             class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"
@@ -42,7 +48,7 @@
           >
           <input
             type="datetime-local"
-            [(ngModel)]="newTask.dueAt"
+            [(ngModel)]="currentTask.dueAt"
             name="dueAt"
             required
             class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"
@@ -52,7 +58,7 @@
       <div class="mt-4 flex justify-end space-x-3">
         <button
           type="button"
-          (click)="cancelAdd()"
+          (click)="cancelEdit()"
           class="px-4 py-2 bg-white border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50"
         >
           Cancel
@@ -62,7 +68,7 @@
           [disabled]="!taskForm.form.valid"
           class="px-4 py-2 bg-slate-900 text-white rounded-md hover:bg-slate-800 disabled:bg-slate-400"
         >
-          Save Task
+          {{ editingTask ? "Update" : "Save" }} Task
         </button>
       </div>
     </form>
@@ -88,7 +94,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-200">
-        <tr *ngFor="let task of tasks; let i = index">
+        <tr *ngFor="let task of tasks">
           <td class="px-6 py-4 text-sm text-slate-900">{{ task.title }}</td>
           <td class="px-6 py-4 text-sm text-slate-600">
             {{ task.description }}
@@ -96,10 +102,21 @@
           <td class="px-6 py-4 text-sm text-slate-600">
             {{ task.dueAt | date: "medium" }}
           </td>
-          <td class="px-6 py-4 text-sm">
+          <td class="px-6 py-4 text-sm space-x-3">
+            <!-- Disable edit button if already editing another task -->
             <button
-              (click)="deleteTask(i)"
+              (click)="startEdit(task)"
+              class="text-slate-600 hover:text-slate-900"
+              [disabled]="isAddingTask || editingTask"
+              [class.opacity-50]="isAddingTask || editingTask"
+            >
+              Edit
+            </button>
+            <button
+              (click)="deleteTask(task.id)"
               class="text-red-600 hover:text-red-900"
+              [disabled]="isAddingTask || editingTask"
+              [class.opacity-50]="isAddingTask || editingTask"
             >
               Delete
             </button>
