@@ -1,5 +1,14 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Task } from "../../task/entities/task.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Task } from '../../task/entities/task.entity';
+import { ProductProperties } from './product-properties.entity';
 
 @Entity('products')
 export class Product {
@@ -21,4 +30,9 @@ export class Product {
 
   @OneToMany(() => Task, (task) => task.product)
   tasks: Task[];
+
+  @OneToOne(() => ProductProperties, (properties) => properties.product, {
+    cascade: ['remove'],
+  })
+  productProperties: ProductProperties;
 }
