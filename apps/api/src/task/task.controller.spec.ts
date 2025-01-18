@@ -3,6 +3,9 @@ import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskExistsGuard } from './guards/task-exists.guard';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Task } from './entities/task.entity';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -20,6 +23,19 @@ describe('TaskController', () => {
             findOne: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
+          },
+        },
+        {
+          provide: TaskExistsGuard,
+          useValue: jest.fn(),
+        },
+        {
+          provide: getRepositoryToken(Task),
+          useValue: {
+            findOne: jest.fn(),
+            find: jest.fn(),
+            save: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -54,6 +70,16 @@ describe('TaskController', () => {
       controller.findOne(id);
       expect(taskService.findOne).toHaveBeenCalledWith(id);
     });
+
+    it('should have TaskExistingGuard attached', () => {
+      const guards = Reflect.getMetadata(
+        '__guards__',
+        TaskController.prototype.findOne,
+      );
+
+      expect(guards).toBeDefined();
+      expect(guards[0]).toEqual(TaskExistsGuard);
+    });
   });
 
   describe('update', () => {
@@ -67,6 +93,16 @@ describe('TaskController', () => {
       controller.update(id, updateTaskDto);
       expect(taskService.update).toHaveBeenCalledWith(id, updateTaskDto);
     });
+
+    it('should have TaskExistingGuard attached', () => {
+      const guards = Reflect.getMetadata(
+        '__guards__',
+        TaskController.prototype.update,
+      );
+
+      expect(guards).toBeDefined();
+      expect(guards[0]).toEqual(TaskExistsGuard);
+    });
   });
 
   describe('remove', () => {
@@ -74,6 +110,16 @@ describe('TaskController', () => {
       const id = '123';
       controller.remove(id);
       expect(taskService.remove).toHaveBeenCalledWith(id);
+    });
+
+    it('should have TaskExistingGuard attached', () => {
+      const guards = Reflect.getMetadata(
+        '__guards__',
+        TaskController.prototype.remove,
+      );
+
+      expect(guards).toBeDefined();
+      expect(guards[0]).toEqual(TaskExistsGuard);
     });
   });
 });

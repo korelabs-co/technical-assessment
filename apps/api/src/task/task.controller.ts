@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskExistsGuard } from './guards/task-exists.guard';
 
 @Controller('tasks')
 export class TaskController {
@@ -9,7 +20,11 @@ export class TaskController {
 
   @Post()
   create(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
+    const task = this.taskService.create(createTaskDto);
+    if (task === null) {
+      throw new NotFoundException();
+    }
+    return task;
   }
 
   @Get()
@@ -18,16 +33,19 @@ export class TaskController {
   }
 
   @Get(':id')
+  @UseGuards(TaskExistsGuard)
   findOne(@Param('id') id: string) {
     return this.taskService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(TaskExistsGuard)
   update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.update(id, updateTaskDto);
   }
 
   @Delete(':id')
+  @UseGuards(TaskExistsGuard)
   remove(@Param('id') id: string) {
     return this.taskService.remove(id);
   }
