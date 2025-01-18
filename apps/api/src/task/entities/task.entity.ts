@@ -1,5 +1,13 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
-import { Product } from "../../product/entities/product.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Product } from '../../product/entities/product.entity';
 
 @Entity('tasks')
 export class Task {
@@ -16,7 +24,7 @@ export class Task {
   dueAt: Date;
 
   @Index()
-  @ManyToOne(() => Product, (product) => product.tasks)
+  @ManyToOne(() => Product, (product) => product.tasks, { onDelete: 'CASCADE' })
   product: Product;
 
   @CreateDateColumn({ update: false, nullable: false })
